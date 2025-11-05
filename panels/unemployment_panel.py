@@ -9,7 +9,7 @@ import plotly.express as px
 def show():
     st.header("Unemployment Rate (% of Total Labor Force)")
 
-    #  Country options (all EU + UK + US) 
+    #  Country options (all of EU + UK + US) 
     countries = {
         "Austria": "AT",
         "Belgium": "BE",
