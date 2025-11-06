@@ -1,9 +1,13 @@
-
 import streamlit as st
 import pandas as pd
 import wbdata
 import datetime
 import plotly.express as px
+
+
+
+
+
 
 
 def show():
@@ -52,7 +56,7 @@ def show():
 
     st.write(f"Fetching unemployment data for **{country_name}**...")
 
-    # --- Fetch World Bank Data for selected country and EU average ---
+    # Fetch World Bank Data for selected country and EU average 
 
     # Exclude UK and US from EU average
     eu_countries = [v for k, v in countries.items() if k not in ["United Kingdom", "United States"]]
@@ -71,7 +75,7 @@ def show():
         date=(start_date, end_date)
     ).sort_index()
 
-    # --- Calculate EU Average ---
+    # Calculate EU Average 
     eu_data = eu_data.reset_index()  # make 'date' a column
     eu_data['date'] = pd.to_datetime(eu_data['date'], errors='coerce')  # ensure datetime type
     eu_data = eu_data.dropna(subset=['date'])  # drop invalid rows
@@ -84,7 +88,7 @@ def show():
         'EU Average (%)': eu_avg.values
     })
 
-    # --- Plotting the data ---
+    # Plotting the data 
     if not df.empty:
         # drop NaNs for summary computations
         df_clean = df.dropna()
@@ -95,7 +99,7 @@ def show():
             labels={"x": "Year", "y": "Unemployment Rate (%)"},
         )
 
-        # --- Add country line manually so it always has the right legend label ---
+        #  Add country line manually so it always has the right legend label
         fig.add_scatter(
             x=df.index,
             y=df["Unemployment rate (%)"],
@@ -105,7 +109,7 @@ def show():
             hovertemplate="Year: %{x|%Y}<br>Unemployment: %{y:.2f}%<extra></extra>"
         )
 
-        # --- Add EU Average Line ---
+        #  Add EU Average Line 
         fig.add_scatter(
             x=eu_avg_df['Year'],
             y=eu_avg_df['EU Average (%)'],
@@ -115,7 +119,7 @@ def show():
             hovertemplate="Year: %{x}<br>EU Average: %{y:.2f}%<extra></extra>"
         )
 
-        # --- Format only the main country's line (not all traces) ---
+        #  Format only the main country's line 
         fig.update_traces(
             selector=dict(name="Unemployment rate (%)"),
             mode="lines+markers",
@@ -124,7 +128,7 @@ def show():
             hovertemplate="Year: %{x|%Y}<br>Unemployment: %{y:.2f}%<extra></extra>"
         )
 
-        # --- Final layout tweaks ---
+        # Final layout tweaks 
         fig.update_layout(
             hovermode="x unified",
             xaxis=dict(tickformat="%Y"),
@@ -142,7 +146,7 @@ def show():
 
         with col_plot:
             st.plotly_chart(fig, use_container_width=True)
-            # --- Dynamic comparison sentence ---
+            # Dynamic comparison sentence 
             try:
                 latest_year = int(df.index[-1].year if hasattr(df.index[-1], "year") else str(df.index[-1]))
                 country_latest = df["Unemployment rate (%)"].iloc[-1]
@@ -221,6 +225,4 @@ def show():
 
     else:
         st.warning("No data available for this selection.")
-
-
-
+        
