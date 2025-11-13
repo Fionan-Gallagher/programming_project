@@ -1,3 +1,4 @@
+# importing libraries
 import streamlit as st
 import pandas as pd
 import datetime
@@ -9,14 +10,11 @@ def load_unemployment_data():
  
 
 
-
-
-
-
+# function to display unemployment panel
 def show():
     st.header("Unemployment Rate (% of Total Labor Force)")
 
-    # Country list (names only, since the CSV stores names, not 2-letter codes)
+    # List of counntries - using all EU countires and the US and UK
     countries = [
         "Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus",
         "Czech Republic", "Denmark", "Estonia", "Finland", "France",
@@ -30,21 +28,21 @@ def show():
     end_date = datetime.datetime.now()
     start_date = datetime.datetime(end_date.year - 34, 1, 1)
 
-    # User selector
+    # User selector for country
     country_name = st.selectbox("Select a country:", countries)
     st.write(f"Fetching unemployment data for **{country_name}**...")
 
     # Load data from the local CSV
     data = load_unemployment_data()
 
-    # --- MAIN CHANGE: filter by name, not by 2-letter code ---
+    # adjustment:  filtering counrties by name, not by their two letter code
     df = data[data["country_code"] == country_name].copy()
 
     # Exclude UK and US from EU average
     eu_countries = [c for c in countries if c not in ["United Kingdom", "United States"]]
     eu_data = data[data["country_code"].isin(eu_countries)].copy()
 
-    # Make sure Year is an int
+    # Making sure Year is an int
     eu_data = eu_data.dropna(subset=["Year"])
     eu_data["Year"] = eu_data["Year"].astype(int)
 
@@ -55,7 +53,7 @@ def show():
         "EU Average (%)": eu_avg.values
     })
 
-    # --- Plot ---
+    # Plotting (and cleaning the data) 
     if not df.empty:
         df_clean = df.dropna()
 
@@ -81,7 +79,7 @@ def show():
             line=dict(color="orange", width=3, dash="dash"),
             hovertemplate="Year: %{x}<br>EU Average: %{y:.2f}%<extra></extra>"
         )
-
+        # adding a hovering feature on the graph
         fig.update_layout(
             hovermode="x unified",
             xaxis=dict(tickformat="%Y"),
@@ -93,7 +91,7 @@ def show():
         with col_plot:
             st.plotly_chart(fig, use_container_width=True)
 
-            # Dynamic comparison
+            # Dynamic comparison between unemployment for Country and EU average
             try:
                 latest_year = int(df["Year"].iloc[-1])
                 country_latest = df["Unemployment rate (%)"].iloc[-1]
@@ -111,7 +109,7 @@ def show():
                     )
             except Exception:
                 st.caption("Comparison unavailable for this year.")
-
+            # getting summary statistics
         with col_stats:
             if not df_clean.empty:
                 series = df_clean["Unemployment rate (%)"]
