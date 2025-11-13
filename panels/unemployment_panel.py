@@ -30,17 +30,41 @@ def show():
 
     # User selector for country
     country_name = st.selectbox("Select a country:", countries)
-    st.write(f"Fetching unemployment data for **{country_name}**...")
-
     # Load data from the local CSV
     data = load_unemployment_data()
 
-    # adjustment:  filtering counrties by name, not by their two letter code
-    df = data[data["country_code"] == country_name].copy()
+    # Adding a year range slider 
+    year_min = int(data["Year"].min())
+    year_max = int(data["Year"].max())
+
+    start_year, end_year = st.slider(
+    "Select year range:",
+        min_value=year_min,
+        max_value=year_max,
+        value=(year_min, year_max)
+    )
+
+    st.write(f"Fetching unemployment data for **{country_name}**...")
+
+
+
+    # adjustment:  filtering counrties by name, not by their two letter code and then flitering by Year Ranges
+    df = data[
+    (data["country_code"] == country_name) &
+    (data["Year"] >= start_year) &
+    (data["Year"] <= end_year)
+    ].copy()
+
 
     # Exclude UK and US from EU average
     eu_countries = [c for c in countries if c not in ["United Kingdom", "United States"]]
-    eu_data = data[data["country_code"].isin(eu_countries)].copy()
+    # adjust eu data for year range slider
+    eu_data = data[
+        (data["country_code"].isin(eu_countries)) &
+        (data["Year"] >= start_year) &
+        (data["Year"] <= end_year)
+    ].copy()
+
 
     # Making sure Year is an int
     eu_data = eu_data.dropna(subset=["Year"])

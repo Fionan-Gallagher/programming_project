@@ -33,4 +33,4 @@ os.makedirs("data", exist_ok=True)
 output_path = os.path.join("data", "unemployment.csv")
 df.to_csv(output_path, index=False)
 
-print(f"✅ Done! Saved to {output_path}")
+print(f"Saved to {output_path}")
